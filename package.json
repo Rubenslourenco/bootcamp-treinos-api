@@ -7,6 +7,9 @@
   "scripts": {
     "dev": "tsx --watch src/index.ts"
   },
+  "engine": {
+    "node": "24.x"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
