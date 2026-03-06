@@ -7,6 +7,7 @@ import fastifySwaggerUI from "@fastify/swagger-ui";
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { auth } from "./lib/auth.js";
+import fastifyApiReference from "@scalar/fastify-api-reference";
 const app= Fastify({
     logger: true
 });
@@ -31,14 +32,42 @@ await app.register(fastifySwagger, {
   transform: jsonSchemaTransform,
 });
 
-await app.register(fastifySwaggerUI, {
-  routePrefix: "/docs",
-});
 
 await app.register(fastifyCors, {
   origin: ["http://localhost:3000"],
   credentials: true,
 });
+
+await app.register(fastifyApiReference, {
+  routePrefix: "/docs",
+  configuration: {
+    sources: [
+      {
+        title: "Bootcamp Treinos API",
+        slug: "bootcamp-treinos-api",
+        url: "/swagger.json",
+      },
+      {
+        title: "Auth API",
+        slug: "auth-api",
+        url: "/api/auth/open-api/generate-schema",
+      },
+    ],
+  },
+});
+
+app.withTypeProvider<ZodTypeProvider>().route({
+  method: "GET",
+  url: "/swagger.json",
+  schema: {
+    hide: true,
+  },
+  handler: async () => {
+    return app.swagger();
+  },
+});
+
+
 
 
 app.withTypeProvider<ZodTypeProvider>().route({
